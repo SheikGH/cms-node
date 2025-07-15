@@ -1,5 +1,6 @@
 # Node.js
 src/notes
+src/notes/
 node_modules
 node_modules/
 .env
