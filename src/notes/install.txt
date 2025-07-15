@@ -1,8 +1,0 @@
-// STEP 1: package.json dependencies
-// npm install express mongoose express-validator cors dotenv
-
-// npm install express mongoose express-validator cors dotenv jsonwebtoken bcryptjs
-npm install mssql dotenv
-
-//Node-Cache for Simple In-Memory Cache (Single-server)
-npm install node-cache
