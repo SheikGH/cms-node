@@ -1,0 +1,216 @@
+// === CLEAN ARCHITECTURE - NODE + EXPRESS + MONGODB ===
+
+// Folder Structure:
+// src/
+// ├── api/                 => Controllers, Routes
+// ├── application/         => DTOs, Interfaces
+// ├── config/              => DB Config
+// ├── core/                => Models
+// ├── infrastructure/      => Repositories
+// ├── services/            => Business Logic
+// ├── middleware/          => Middleware
+// └── app.js, server.js
+
+// STEP 1: package.json dependencies
+// npm install express mongoose express-validator cors dotenv
+
+// File: src/config/db.config.js
+const mongoose = require('mongoose');
+require('dotenv').config();
+
+const connectDB = async () => {
+  try {
+    await mongoose.connect(process.env.MONGO_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    console.log('MongoDB connected');
+  } catch (err) {
+    console.error(err);
+    process.exit(1);
+  }
+};
+
+module.exports = connectDB;
+
+// File: src/core/models/customer.model.js
+const mongoose = require('mongoose');
+
+const customerSchema = new mongoose.Schema({
+  customerId: { type: String, required: true, unique: true },
+  firstName: { type: String, required: true },
+  lastName: { type: String, required: true },
+  email: { type: String, required: true, unique: true },
+  phone: { type: String },
+  address: { type: String },
+  password: { type: String, required: true },
+  role: { type: String, default: 'user' },
+}, { timestamps: true });
+
+module.exports = mongoose.model('Customer', customerSchema);
+
+// File: src/application/dto/customer.dto.js
+class CustomerDTO {
+  constructor({ customerId, firstName, lastName, email, phone, address, password, role }) {
+    this.customerId = customerId;
+    this.firstName = firstName;
+    this.lastName = lastName;
+    this.email = email;
+    this.phone = phone;
+    this.address = address;
+    this.password = password;
+    this.role = role;
+  }
+}
+
+module.exports = CustomerDTO;
+
+// File: src/infrastructure/repositories/customer.repository.js
+const Customer = require('../../core/models/customer.model');
+
+class CustomerRepository {
+  async create(data) {
+    return await Customer.create(data);
+  }
+
+  async findAll() {
+    return await Customer.find();
+  }
+
+  async findById(id) {
+    return await Customer.findById(id);
+  }
+
+  async update(id, data) {
+    return await Customer.findByIdAndUpdate(id, data, { new: true });
+  }
+
+  async delete(id) {
+    return await Customer.findByIdAndDelete(id);
+  }
+}
+
+module.exports = new CustomerRepository();
+
+// File: src/services/customer.service.js
+const CustomerDTO = require('../application/dto/customer.dto');
+const customerRepository = require('../infrastructure/repositories/customer.repository');
+
+class CustomerService {
+  async createCustomer(data) {
+    const dto = new CustomerDTO(data);
+    return await customerRepository.create(dto);
+  }
+
+  async getAllCustomers() {
+    return await customerRepository.findAll();
+  }
+
+  async getCustomerById(id) {
+    return await customerRepository.findById(id);
+  }
+
+  async updateCustomer(id, data) {
+    return await customerRepository.update(id, data);
+  }
+
+  async deleteCustomer(id) {
+    return await customerRepository.delete(id);
+  }
+}
+
+module.exports = new CustomerService();
+
+// File: src/api/controllers/customer.controller.js
+const customerService = require('../../services/customer.service');
+
+exports.create = async (req, res, next) => {
+  try {
+    const customer = await customerService.createCustomer(req.body);
+    res.status(201).json(customer);
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.getAll = async (req, res, next) => {
+  try {
+    const customers = await customerService.getAllCustomers();
+    res.json(customers);
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.getById = async (req, res, next) => {
+  try {
+    const customer = await customerService.getCustomerById(req.params.id);
+    res.json(customer);
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.update = async (req, res, next) => {
+  try {
+    const updated = await customerService.updateCustomer(req.params.id, req.body);
+    res.json(updated);
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.remove = async (req, res, next) => {
+  try {
+    await customerService.deleteCustomer(req.params.id);
+    res.status(204).send();
+  } catch (err) {
+    next(err);
+  }
+};
+
+// File: src/api/routes/customer.routes.js
+const express = require('express');
+const router = express.Router();
+const customerController = require('../controllers/customer.controller');
+
+router.post('/', customerController.create);
+router.get('/', customerController.getAll);
+router.get('/:id', customerController.getById);
+router.put('/:id', customerController.update);
+router.delete('/:id', customerController.remove);
+
+module.exports = router;
+
+// File: src/middleware/error.middleware.js
+module.exports = (err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ error: err.message });
+};
+
+// File: src/app.js
+const express = require('express');
+const cors = require('cors');
+const customerRoutes = require('./api/routes/customer.routes');
+const connectDB = require('./config/db.config');
+const errorMiddleware = require('./middleware/error.middleware');
+
+const app = express();
+connectDB();
+
+app.use(cors());
+app.use(express.json());
+
+app.use('/api/customers', customerRoutes);
+app.use(errorMiddleware);
+
+module.exports = app;
+
+// File: src/server.js
+const app = require('./app');
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+// File: .env
+// MONGO_URI=mongodb://localhost:27017/yourdb

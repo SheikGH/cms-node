@@ -1,0 +1,424 @@
+Customer Management System – User Guide
+
+I.	Frontend : React.js, Tailwind CSS with JWT Authentication
+II.	Backend : Dot Net Core, Web API, Entity Framework Core, SQL Server with Clear Architecture
+
+I. Frontend – React.js, Tailwind CSS with JWT Authentication
+
+React Web Site Url: http://localhost:3000/
+
+1. Register Page: To Add new customer
+i. Check Form Validation: Validation Error message is showing if not enter proper customer details.
+ii. Enter Customer valid details: Click 'Register' button then customer data go to backend api and save database
+
+2. Login Page:
+
+i. Check Form Validation:
+Validation Error message is showing. 
+If not enter the proper email and password.
+If enter invalid email and password.
+
+ii. Enter valid credential:
+Email: abdul.rahman@gmail.com
+Password: Abdul@123
+
+Now Login credential email and password it send to backend api, api will validate email and password.
+If credential is not valid return error message.
+If credential is valid then create JWT token and retuen to the client.
+React will save it in localStorage then redirect to Customer List page
+
+3. Customer List Page: 
+i. View Customer: 
+Now we can see registed customer details in Customer List page
+
+ii. Edit Customer: 
+i. Check Form Validation: Validation Error message is showing if not enter proper customer details.
+ii. Enter Customer valid details: Click 'Update' button then customer data go to backend api and save database then reload customer list page now display newly edited details.
+
+iii. Delete Customer:
+if click 'Delete' button on the Customer List page then delete customer record in the List.
+
+4. Logout:
+Once click 'Logout' button. 
+Saved JWT token will delete.
+Page will redirect to Login page
+
+
+
+II.	Backend : Dot Net Core, Web API, Entity Framework Core, SQL Server with Clear Architecture
+.Net Core Site Url: https://localhost:7067/swagger/index.html
+customer model with fields customerId, firstName, lastName, email, phone, address, password, role
+1. Authentication End Point: 
+Login by using email and password with End Point - 
+GET: https://localhost:7067/api/Auth/login
+POST: http://localhost:7067/api/auth/login
+{
+    "email": "john.doe@example.com",
+    "password": "John@123"
+}
+{"email":"john.doe@example.com","password":"John@123"}
+{ "email": "martin2@gmail.com","password":"Martin2@123"}
+OUTPUT:
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1hcnRpbjJAZ21haWwuY29tIiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNzUxMDI0NzM2LCJleHAiOjE3NTEwNjA3MzZ9.Og6gIktQvl4c_FZkkB4PfwJAQ0eHFo-TziZAcVThZ3Y",
+  "username": "martin2@gmail.com",
+  "role": "admin"
+}
+
+SQL:
+{"email":"john.doe3@example.com", "password":"John3@123"}
+OUTPUT:
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImpvaG4uZG9lM0BleGFtcGxlLmNvbSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc1MTAzNTg1NSwiZXhwIjoxNzUxMDcxODU1fQ.ZS-ULnorD8cWAnVZX7MR3_OYgc83N_EDpK4LDKV6lEM",
+  "username": "john.doe3@example.com",
+  "role": "admin"
+}
+
+
+1.1. Register Customer detail with below data and its End Point - 
+POST: http://localhost:7067/api/auth/register
+{
+    "customerId": "1",
+    "firstName": "Martin",
+    "lastName": "Luther",
+    "email": "martin@gmail.com",
+    "phone": "682993456",
+    "address": "USA",
+	"password":"Martin@123",
+	"role":"admin"
+}
+{
+    "customerId": "5",
+    "firstName": "Martin5",
+    "lastName": "Luther",
+    "email": "martin5@gmail.com",
+    "phone": "682993456",
+    "address": "USA",
+    "password": "Martin5@123",
+    "role": "admin"
+  }
+SQL:
+{"firstName":"John3","lastName":"Doe3","email":"john.doe3@example.com", "password":"John3@123", "role":"admin","phone":"1234567890","address":"123 Main St"}
+{
+      CustomerId: 1016,
+      FirstName: 'John3',
+      LastName: 'Doe3',
+      Email: 'john.doe3@example.com',
+      Phone: '1234567890',
+      Address: '123 Main St',
+      Password: '$2b$10$sR2bZvyAHq8TNdcxj2iJPOAtC/uFD6f0MQh4RLl1XVNFB6jUsRCKW',
+      PasswordKey: null,
+      Role: 'admin'
+    }
+2. Get All Customer End Points - 
+GET: https://localhost:7067/api/Customers
+http://localhost:7067/api/customers
+token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImpvaG4uZG9lQGV4YW1wbGUuY29tIiwicm9sZSI6IkFkbWluIiwiaWF0IjoxNzUwOTQ4NDA0LCJleHAiOjE3NTA5NTIwMDR9.gdB97fBXfM99gWSbACuqsICMBirAD1D4PcL2iZOTpkQ
+
+Display all customer details
+
+
+3. Get particular customer by customer id with End Point https://localhost:7067/api/Customers/2
+
+4. Added Customer detail with below data and its End Point - POST: https://localhost:7067/api/Customers
+{
+    "firstName": "Martin",
+    "lastName": "Luther",
+    "email": "martin@gmail.com",
+    "phone": "682993456",
+    "address": "USA",
+	"password":"Martin@123",
+	"role":"admin"
+}
+
+5. Edit Customer detail with below data and its End point – PUT : https://localhost:7067/api/Customers/7
+{
+    "customerId":"1008",
+    "firstName": "Martin",
+    "lastName": "King",
+    "email": "king@gmail.com",
+    "phone": "682993456",
+    "address": "UK",
+    "password":"Martin@123",
+	"role":"Admin"
+}
+
+6. Deleted Customer by CustomerId = 7 with End Point - DELETE: https://localhost:7067/api/Customers/7
+
+7.Search Customer:
+http://localhost:7067/api/customers/search?q=john
+
+MongoDB:
+[
+  {
+    "_id": "684c52d7d685a51ab8882e21",
+    "customerId": "1",
+    "firstName": "John",
+    "lastName": "Doe",
+    "email": "john.doe@example.com",
+    "phone": "1234567890",
+    "address": "123 Main St",
+    "password": "John@123",
+    "role": "Admin",
+    "createdAt": "2025-06-13T16:33:27.422Z",
+    "updatedAt": "2025-06-13T16:33:27.422Z",
+    "__v": 0
+  },
+  {
+    "_id": "684c6ecda45ce978280feacf",
+    "customerId": "2",
+    "firstName": "Martin",
+    "lastName": "Luther",
+    "email": "martin@gmail.com",
+    "phone": "682993456",
+    "address": "USA",
+    "password": "Martin@123",
+    "role": "Admin",
+    "createdAt": "2025-06-13T18:32:45.149Z",
+    "updatedAt": "2025-06-13T18:32:45.149Z",
+    "__v": 0
+  },
+  {
+    "_id": "685db5d3b83b5e418de6df62",
+    "customerId": "4",
+    "firstName": "Martin2",
+    "lastName": "Luther2",
+    "email": "martin2@gmail.com",
+    "phone": "682993456",
+    "address": "USA",
+    "password": "$2b$10$oz6UfOmT4cYOxRlXaC0KGumXCh9Pfrl78qZE5Zo3kFuXvR3AwwI02",
+    "role": "admin",
+    "createdAt": "2025-06-26T21:04:19.044Z",
+    "updatedAt": "2025-06-26T21:29:13.598Z",
+    "__v": 0
+  },
+  {
+    "_id": "685e73913338e966be43e1cc",
+    "customerId": "5",
+    "firstName": "Martin5",
+    "lastName": "Luther",
+    "email": "martin5@gmail.com",
+    "phone": "682993456",
+    "address": "USA",
+    "password": "$2b$10$XxqACiiAuuXaXq1pgq8UK.H2A.4Z1pplzgzsObe9KdF7nn6.hfDd2",
+    "role": "admin",
+    "createdAt": "2025-06-27T10:33:53.464Z",
+    "updatedAt": "2025-06-27T10:33:53.464Z",
+    "__v": 0
+  }
+]
+
+
+SQL:
+
+[
+  {
+    "CustomerId": 1,
+    "FirstName": "John",
+    "LastName": "Doe",
+    "Email": "john.doe@example.com",
+    "Phone": "1234567890",
+    "Address": "123 Main St",
+    "Password": "John@123",
+    "PasswordKey": "John@123",
+    "Role": null
+  },
+  {
+    "CustomerId": 2,
+    "FirstName": "Jane",
+    "LastName": "Smith",
+    "Email": "jane.smith@example.com",
+    "Phone": "0987654321",
+    "Address": "456 Elm St",
+    "Password": "Jane@123",
+    "PasswordKey": "Jane@123",
+    "Role": null
+  },
+  {
+    "CustomerId": 3,
+    "FirstName": "Leanne",
+    "LastName": "Graham",
+    "Email": "Sincere@example.com",
+    "Phone": "17707368031",
+    "Address": "Kulas Light",
+    "Password": "Leanne@123",
+    "PasswordKey": "Leanne@123",
+    "Role": null
+  },
+  {
+    "CustomerId": 4,
+    "FirstName": "Dennis",
+    "LastName": "Schulist",
+    "Email": "dennis@example.com",
+    "Phone": "098-765-4321",
+    "Address": "Suite 879",
+    "Password": "Dennis@123",
+    "PasswordKey": "Dennis@123",
+    "Role": null
+  },
+  {
+    "CustomerId": 5,
+    "FirstName": "Glenna",
+    "LastName": "Reichert",
+    "Email": "glenna@example.com",
+    "Phone": "123-456-7890",
+    "Address": "Proactive didactic contingency",
+    "Password": "Glenna@123",
+    "PasswordKey": "Glenna@123",
+    "Role": null
+  },
+  {
+    "CustomerId": 6,
+    "FirstName": "Ervin",
+    "LastName": "Howell",
+    "Email": "ervin@example.com",
+    "Phone": "0987654321",
+    "Address": "Wisokyburgh",
+    "Password": "Ervin@123",
+    "PasswordKey": "Ervin@123",
+    "Role": null
+  },
+  {
+    "CustomerId": 7,
+    "FirstName": "AAaAASS",
+    "LastName": "adsaDFF",
+    "Email": "sssswww@gmail.com",
+    "Phone": "0534323432",
+    "Address": "AbuDubai",
+    "Password": null,
+    "PasswordKey": null,
+    "Role": null
+  },
+  {
+    "CustomerId": 8,
+    "FirstName": "dsdsad",
+    "LastName": "dsdsadas",
+    "Email": "dsdasdas@gmail.com",
+    "Phone": "0566343443",
+    "Address": "Ajman",
+    "Password": "bbbbb@1",
+    "PasswordKey": null,
+    "Role": null
+  },
+  {
+    "CustomerId": 1001,
+    "FirstName": "ASSA",
+    "LastName": "ASSSS",
+    "Email": "ddd@gmail.com",
+    "Phone": "0454545454",
+    "Address": "Ajman",
+    "Password": "ddd@123",
+    "PasswordKey": "ddd@123",
+    "Role": null
+  },
+  {
+    "CustomerId": 1002,
+    "FirstName": "sddsada",
+    "LastName": "sdasd",
+    "Email": "ssss@gmail.com",
+    "Phone": "0534323466",
+    "Address": "ADSHSS",
+    "Password": null,
+    "PasswordKey": null,
+    "Role": null
+  },
+  {
+    "CustomerId": 1003,
+    "FirstName": "dddd",
+    "LastName": "ffff",
+    "Email": "ffff@gmail.com",
+    "Phone": "0565565657",
+    "Address": "Nuaimiya 2",
+    "Password": "fff@123",
+    "PasswordKey": null,
+    "Role": null
+  },
+  {
+    "CustomerId": 1004,
+    "FirstName": "xxxx",
+    "LastName": "xxxxx",
+    "Email": "xxxx@gmail.com",
+    "Phone": "7676776676",
+    "Address": "Roll Street",
+    "Password": "xxx@123",
+    "PasswordKey": null,
+    "Role": null
+  },
+  {
+    "CustomerId": 1005,
+    "FirstName": "dsads",
+    "LastName": "vvvv",
+    "Email": "vvvv@gmail.com",
+    "Phone": "6565465465",
+    "Address": "Nuaimiya 2",
+    "Password": null,
+    "PasswordKey": null,
+    "Role": null
+  },
+  {
+    "CustomerId": 1008,
+    "FirstName": "Martin",
+    "LastName": "King1",
+    "Email": "king@gmail.com",
+    "Phone": "682993456",
+    "Address": "UK1",
+    "Password": "Martin@123",
+    "PasswordKey": null,
+    "Role": "Admin"
+  },
+  {
+    "CustomerId": 1011,
+    "FirstName": "Martin",
+    "LastName": "Luther",
+    "Email": "martin@gmail.com",
+    "Phone": "682993456",
+    "Address": "USA",
+    "Password": "Martin@123",
+    "PasswordKey": null,
+    "Role": "Admin"
+  },
+  {
+    "CustomerId": 1013,
+    "FirstName": "Martin1",
+    "LastName": "Luther1",
+    "Email": "martin11@gmail.com",
+    "Phone": "682993456",
+    "Address": "USA",
+    "Password": "Martin@123",
+    "PasswordKey": null,
+    "Role": "Admin"
+  },
+  {
+    "CustomerId": 1014,
+    "FirstName": "Martin1",
+    "LastName": "Luther1",
+    "Email": "martin12@gmail.com",
+    "Phone": "682993456",
+    "Address": "USA",
+    "Password": "Martin@123",
+    "PasswordKey": null,
+    "Role": "Admin"
+  },
+  {
+    "CustomerId": 1015,
+    "FirstName": "Martin3",
+    "LastName": "Luther1",
+    "Email": "martin13@gmail.com",
+    "Phone": "682993456",
+    "Address": "USA",
+    "Password": "Martin@123",
+    "PasswordKey": null,
+    "Role": "Admin"
+  },
+  {
+    "CustomerId": 1016,
+    "FirstName": "John3",
+    "LastName": "Doe3",
+    "Email": "john.doe3@example.com",
+    "Phone": "1234567890",
+    "Address": "123 Main St",
+    "Password": "$2b$10$sR2bZvyAHq8TNdcxj2iJPOAtC/uFD6f0MQh4RLl1XVNFB6jUsRCKW",
+    "PasswordKey": null,
+    "Role": "admin"
+  }
+]

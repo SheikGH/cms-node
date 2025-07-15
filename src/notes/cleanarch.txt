@@ -1,0 +1,24 @@
+my-enterprise-app/
++-- src/
+¦   +-- api/                    # API layer - route definitions
+¦   ¦   +-- controllers/        # Request handlers (Login, Register, etc.)
+¦   ¦   +-- routes/             # Express route definitions
+¦   ¦   +-- middlewares/       # Auth, error handling, etc.
+¦   +-- application/           # Application logic / use cases
+¦   ¦   +-- dtos/               # Data Transfer Objects
+¦   ¦   +-- services/           # Business logic (LoginService, etc.)
+¦   +-- domain/                # Entities, Interfaces, Repositories (abstract)
+¦   ¦   +-- models/             # Core domain models
+¦   ¦   +-- interfaces/         # Contracts for services & repositories
+¦   ¦   +-- enums/              # Domain enums (e.g., Roles)
+¦   +-- infrastructure/        # Implementation (DB, cache, services)
+¦   ¦   +-- db/                 # DB setup, migrations, and data access
+¦   ¦   +-- repositories/       # Concrete repo implementations
+¦   +-- config/                # Config files for env, db, etc.
+¦   +-- utils/                 # Utilities (e.g., JWT, logger)
+¦   +-- app.js                 # Express app setup
+¦   +-- server.js              # App startup
++-- .env
++-- .gitignore
++-- package.json
++-- README.md

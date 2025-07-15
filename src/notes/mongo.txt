@@ -1,0 +1,33 @@
+mongod
+mongosh
+
+show dbs
+db //show current 
+db.versions
+db.help()
+
+use cms
+db.createCollection('Customer');
+show collections
+
+db.customers.find()
+db.customers.find({firstName:'Tom'})
+db.customers.find({'detail.position':'manager'})
+db.customers.find()
+db.customers.findOne({'email':'john.doe@example.com', 'password':'John@123'});
+
+db.Customer.insert({})
+db.Customer.insertOne({})
+db.Customer.insertMany({})
+
+db.Customer.update({})
+db.Customer.updateOne({})
+db.Customer.updateMany({})
+
+db.Customer.delete({})
+db.Customer.deleteOne({})
+db.Customer.deleteMany({})
+
+db.drop.database()
+db.Customer.drop()
+db.getCollections('Customer').drop()

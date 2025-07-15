@@ -1,0 +1,136 @@
+enterprise backend application with node.js with express.js and clear architecture
+- please give me code for manage mutiple routing with pages login, register, customer, product, order, payment, cart
+
+// File: src/api/routes/index.js
+
+const express = require('express');
+const router = express.Router();
+
+const authRoutes = require('./auth.routes');
+const customerRoutes = require('./customer.routes');
+const productRoutes = require('./product.routes');
+const orderRoutes = require('./order.routes');
+const paymentRoutes = require('./payment.routes');
+const cartRoutes = require('./cart.routes');
+
+router.use('/auth', authRoutes);           // /api/auth/login, /api/auth/register
+router.use('/customers', customerRoutes);  // /api/customers
+router.use('/products', productRoutes);    // /api/products
+router.use('/orders', orderRoutes);        // /api/orders
+router.use('/payments', paymentRoutes);    // /api/payments
+router.use('/cart', cartRoutes);           // /api/cart
+
+module.exports = router;
+
+
+// File: src/api/routes/auth.routes.js
+
+const express = require('express');
+const router = express.Router();
+const AuthController = require('../controllers/auth.controller');
+
+router.post('/login', AuthController.login);
+router.post('/register', AuthController.register);
+
+module.exports = router;
+
+
+// File: src/api/routes/customer.routes.js
+
+const express = require('express');
+const router = express.Router();
+const CustomerController = require('../controllers/customer.controller');
+
+router.get('/', CustomerController.getAll);
+router.get('/:id', CustomerController.getById);
+router.post('/', CustomerController.create);
+router.put('/:id', CustomerController.update);
+router.delete('/:id', CustomerController.remove);
+
+module.exports = router;
+
+
+// File: src/api/routes/product.routes.js
+
+const express = require('express');
+const router = express.Router();
+const ProductController = require('../controllers/product.controller');
+
+router.get('/', ProductController.getAll);
+router.get('/:id', ProductController.getById);
+router.post('/', ProductController.create);
+router.put('/:id', ProductController.update);
+router.delete('/:id', ProductController.remove);
+
+module.exports = router;
+
+
+// File: src/api/routes/order.routes.js
+
+const express = require('express');
+const router = express.Router();
+const OrderController = require('../controllers/order.controller');
+
+router.get('/', OrderController.getAll);
+router.get('/:id', OrderController.getById);
+router.post('/', OrderController.create);
+router.put('/:id', OrderController.update);
+router.delete('/:id', OrderController.remove);
+
+module.exports = router;
+
+
+// File: src/api/routes/payment.routes.js
+
+const express = require('express');
+const router = express.Router();
+const PaymentController = require('../controllers/payment.controller');
+
+router.get('/', PaymentController.getAll);
+router.get('/:id', PaymentController.getById);
+router.post('/', PaymentController.create);
+router.put('/:id', PaymentController.update);
+router.delete('/:id', PaymentController.remove);
+
+module.exports = router;
+
+
+// File: src/api/routes/cart.routes.js
+
+const express = require('express');
+const router = express.Router();
+const CartController = require('../controllers/cart.controller');
+
+router.get('/', CartController.getAll);
+router.get('/:id', CartController.getById);
+router.post('/', CartController.create);
+router.put('/:id', CartController.update);
+router.delete('/:id', CartController.remove);
+
+module.exports = router;
+
+
+// File: src/app.js
+
+const express = require('express');
+const bodyParser = require('body-parser');
+const cors = require('cors');
+const routes = require('./api/routes');
+
+const app = express();
+
+app.use(cors());
+app.use(bodyParser.json());
+app.use('/api', routes);
+
+module.exports = app;
+
+
+// File: src/server.js
+
+const app = require('./app');
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});

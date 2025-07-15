@@ -1,0 +1,17 @@
+mongoose have stored procedure ? 
+-------------------------------------------
+Where we can create instance for mongoose whether in app.js - 
+
+const connectDB = require('./config/mongodb.config');
+connectDB(); - 
+or in repository in enterprise clean architecture ? 
+---------------------------------
+Services:
+direct export function -
+exports.login = async (data) => {} 
+-
+is correct or export function via class is best ? -
+class AuthService {
+    async login(email, password) { } 
+}
+module.exports = new AuthService(); 

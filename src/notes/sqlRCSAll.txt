@@ -1,0 +1,468 @@
+
+The project has now been expanded to include Product and Order modules alongside Customer
+, with secure architecture, error handling, and modular routing using Express. 
+Here's a summary of what’s now included:
+
+✅ Modules Implemented
+Auth: Login & Register
+
+Customer: Full CRUD
+
+Product: Full CRUD
+
+Order: Full CRUD
+
+✅ Architecture Highlights
+Security: Helmet, CORS, Auth Middleware
+
+Logging: Morgan
+
+Error Handling: Global error middleware
+
+Separation of Concerns: Routes → Controllers → Services
+
+Token-based Authorization: Simple middleware (valid-token demo)
+
+📁 Folder Structure
+css
+Copy
+Edit
+src/
+├── api/
+│   ├── routes/
+│   │   ├── auth.routes.js
+│   │   ├── customer.routes.js
+│   │   ├── product.routes.js
+│   │   └── order.routes.js
+│   └── controllers/
+│       ├── auth.controller.js
+│       ├── customer.controller.js
+│       ├── product.controller.js
+│       └── order.controller.js
+├── services/
+│   ├── auth.service.js
+│   ├── customer.service.js
+│   ├── product.service.js
+│   └── order.service.js
+├── middleware/
+│   ├── auth.middleware.js
+│   └── error.middleware.js
+├── app.js
+└── server.js
+Would you like me to:
+
+Add OrderDetails to support many-to-one relationship with Order?
+
+Integrate MongoDB or SQL (currently using in-memory arrays)?
+
+Implement validations (e.g. using Joi or express-validator)?
+
+Add pagination, sorting, or filtering features?
+
+// === SECURITY, ERROR HANDLING, MIDDLEWARE INTEGRATED ARCHITECTURE ===
+
+// File: src/app.js
+
+const express = require('express');
+const bodyParser = require('body-parser');
+const cors = require('cors');
+const helmet = require('helmet');
+const morgan = require('morgan');
+const routes = require('./api/routes');
+const errorMiddleware = require('./middleware/error.middleware');
+
+const app = express();
+
+// Security Middlewares
+app.use(cors());
+app.use(helmet());
+app.use(morgan('dev'));
+app.use(bodyParser.json());
+
+// Routes
+app.use('/api', routes);
+
+// Global Error Handler
+app.use(errorMiddleware);
+
+module.exports = app;
+
+
+// File: src/server.js
+
+const app = require('./app');
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
+
+
+// File: src/middleware/auth.middleware.js
+
+module.exports = (req, res, next) => {
+  const token = req.headers['authorization'];
+  if (!token) return res.status(401).json({ message: 'Access Denied: No Token Provided!' });
+  if (token !== 'valid-token') return res.status(403).json({ message: 'Invalid Token!' });
+  next();
+};
+
+
+// File: src/middleware/error.middleware.js
+
+module.exports = (err, req, res, next) => {
+  console.error(err.stack);
+  res.status(err.status || 500).json({ error: err.message || 'Internal Server Error' });
+};
+
+
+// File: src/api/routes/auth.routes.js
+
+const express = require('express');
+const router = express.Router();
+const AuthController = require('../controllers/auth.controller');
+
+router.post('/login', AuthController.login);
+router.post('/register', AuthController.register);
+
+module.exports = router;
+
+
+// File: src/api/routes/customer.routes.js
+
+const express = require('express');
+const router = express.Router();
+const CustomerController = require('../controllers/customer.controller');
+const authMiddleware = require('../../middleware/auth.middleware');
+
+router.use(authMiddleware);
+
+router.get('/', CustomerController.getAll);
+router.get('/:id', CustomerController.getById);
+router.post('/', CustomerController.create);
+router.put('/:id', CustomerController.update);
+router.delete('/:id', CustomerController.remove);
+
+module.exports = router;
+
+
+// File: src/api/routes/product.routes.js
+
+const express = require('express');
+const router = express.Router();
+const ProductController = require('../controllers/product.controller');
+const authMiddleware = require('../../middleware/auth.middleware');
+
+router.use(authMiddleware);
+
+router.get('/', ProductController.getAll);
+router.get('/:id', ProductController.getById);
+router.post('/', ProductController.create);
+router.put('/:id', ProductController.update);
+router.delete('/:id', ProductController.remove);
+
+module.exports = router;
+
+
+// File: src/api/routes/order.routes.js
+
+const express = require('express');
+const router = express.Router();
+const OrderController = require('../controllers/order.controller');
+const authMiddleware = require('../../middleware/auth.middleware');
+
+router.use(authMiddleware);
+
+router.get('/', OrderController.getAll);
+router.get('/:id', OrderController.getById);
+router.post('/', OrderController.create);
+router.put('/:id', OrderController.update);
+router.delete('/:id', OrderController.remove);
+
+module.exports = router;
+
+
+// File: src/api/controllers/auth.controller.js
+
+const AuthService = require('../../services/auth.service');
+
+exports.login = async (req, res, next) => {
+  try {
+    const result = await AuthService.login(req.body);
+    res.status(200).json(result);
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.register = async (req, res, next) => {
+  try {
+    const result = await AuthService.register(req.body);
+    res.status(201).json(result);
+  } catch (err) {
+    next(err);
+  }
+};
+
+
+// File: src/api/controllers/customer.controller.js
+
+const CustomerService = require('../../services/customer.service');
+
+exports.getAll = async (req, res, next) => {
+  try {
+    const customers = await CustomerService.getAll();
+    res.json(customers);
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.getById = async (req, res, next) => {
+  try {
+    const customer = await CustomerService.getById(req.params.id);
+    res.json(customer);
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.create = async (req, res, next) => {
+  try {
+    const newCustomer = await CustomerService.create(req.body);
+    res.status(201).json(newCustomer);
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.update = async (req, res, next) => {
+  try {
+    const updatedCustomer = await CustomerService.update(req.params.id, req.body);
+    res.json(updatedCustomer);
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.remove = async (req, res, next) => {
+  try {
+    await CustomerService.remove(req.params.id);
+    res.status(204).send();
+  } catch (err) {
+    next(err);
+  }
+};
+
+
+// File: src/api/controllers/product.controller.js
+
+const ProductService = require('../../services/product.service');
+
+exports.getAll = async (req, res, next) => {
+  try {
+    const products = await ProductService.getAll();
+    res.json(products);
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.getById = async (req, res, next) => {
+  try {
+    const product = await ProductService.getById(req.params.id);
+    res.json(product);
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.create = async (req, res, next) => {
+  try {
+    const newProduct = await ProductService.create(req.body);
+    res.status(201).json(newProduct);
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.update = async (req, res, next) => {
+  try {
+    const updatedProduct = await ProductService.update(req.params.id, req.body);
+    res.json(updatedProduct);
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.remove = async (req, res, next) => {
+  try {
+    await ProductService.remove(req.params.id);
+    res.status(204).send();
+  } catch (err) {
+    next(err);
+  }
+};
+
+
+// File: src/api/controllers/order.controller.js
+
+const OrderService = require('../../services/order.service');
+
+exports.getAll = async (req, res, next) => {
+  try {
+    const orders = await OrderService.getAll();
+    res.json(orders);
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.getById = async (req, res, next) => {
+  try {
+    const order = await OrderService.getById(req.params.id);
+    res.json(order);
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.create = async (req, res, next) => {
+  try {
+    const newOrder = await OrderService.create(req.body);
+    res.status(201).json(newOrder);
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.update = async (req, res, next) => {
+  try {
+    const updatedOrder = await OrderService.update(req.params.id, req.body);
+    res.json(updatedOrder);
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.remove = async (req, res, next) => {
+  try {
+    await OrderService.remove(req.params.id);
+    res.status(204).send();
+  } catch (err) {
+    next(err);
+  }
+};
+
+
+// File: src/services/auth.service.js
+
+exports.login = async ({ email, password }) => {
+  if (email === 'admin@example.com' && password === 'password') {
+    return { token: 'valid-token', user: { id: 1, email } };
+  }
+  throw new Error('Invalid credentials');
+};
+
+exports.register = async ({ email, password }) => {
+  return { id: 1, email };
+};
+
+
+// File: src/services/customer.service.js
+
+const customers = [];
+
+exports.getAll = async () => customers;
+
+exports.getById = async (id) => {
+  const customer = customers.find(c => c.id == id);
+  if (!customer) throw new Error('Customer not found');
+  return customer;
+};
+
+exports.create = async (data) => {
+  const id = customers.length + 1;
+  const newCustomer = { id, ...data };
+  customers.push(newCustomer);
+  return newCustomer;
+};
+
+exports.update = async (id, data) => {
+  const index = customers.findIndex(c => c.id == id);
+  if (index === -1) throw new Error('Customer not found');
+  customers[index] = { ...customers[index], ...data };
+  return customers[index];
+};
+
+exports.remove = async (id) => {
+  const index = customers.findIndex(c => c.id == id);
+  if (index === -1) throw new Error('Customer not found');
+  customers.splice(index, 1);
+};
+
+
+// File: src/services/product.service.js
+
+const products = [];
+
+exports.getAll = async () => products;
+
+exports.getById = async (id) => {
+  const product = products.find(p => p.id == id);
+  if (!product) throw new Error('Product not found');
+  return product;
+};
+
+exports.create = async (data) => {
+  const id = products.length + 1;
+  const newProduct = { id, ...data };
+  products.push(newProduct);
+  return newProduct;
+};
+
+exports.update = async (id, data) => {
+  const index = products.findIndex(p => p.id == id);
+  if (index === -1) throw new Error('Product not found');
+  products[index] = { ...products[index], ...data };
+  return products[index];
+};
+
+exports.remove = async (id) => {
+  const index = products.findIndex(p => p.id == id);
+  if (index === -1) throw new Error('Product not found');
+  products.splice(index, 1);
+};
+
+
+// File: src/services/order.service.js
+
+const orders = [];
+
+exports.getAll = async () => orders;
+
+exports.getById = async (id) => {
+  const order = orders.find(o => o.id == id);
+  if (!order) throw new Error('Order not found');
+  return order;
+};
+
+exports.create = async (data) => {
+  const id = orders.length + 1;
+  const newOrder = { id, ...data };
+  orders.push(newOrder);
+  return newOrder;
+};
+
+exports.update = async (id, data) => {
+  const index = orders.findIndex(o => o.id == id);
+  if (index === -1) throw new Error('Order not found');
+  orders[index] = { ...orders[index], ...data };
+  return orders[index];
+};
+
+exports.remove = async (id) => {
+  const index = orders.findIndex(o => o.id == id);
+  if (index === -1) throw new Error('Order not found');
+  orders.splice(index, 1);
+};
