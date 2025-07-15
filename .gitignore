@@ -1,2 +1,9 @@
+# Node.js
+src/notes
 node_modules
+node_modules/
 .env
+*.log
+.DS_Store
+coverage/
+dist/
